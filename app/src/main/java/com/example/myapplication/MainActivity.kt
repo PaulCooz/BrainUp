@@ -8,16 +8,12 @@ import kotlin.random.Random
 
 class MainActivity : AppCompatActivity()
 {
-    private var sum: Int = 0
-    private var ans: Int = 0
-    private var mod: Int = 10
-
     override fun onCreate(savedInstanceState: Bundle?)
     {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val button1: Button = findViewById(R.id.button1)
+        val button1: Button = findViewById(R.id.button1)                        // Set all buttons
         button1.setOnClickListener()
         {
             checkButton(button1)
@@ -38,37 +34,43 @@ class MainActivity : AppCompatActivity()
             checkButton(button4)
         }
 
-        nextGame()
+        nextGame()                                                              // Start!
     }
 
-    fun checkButton(currentButt: Button)
+    private var ans: Int = 0                                                    // Right answer
+    private var mod: Int = 10                                                   // Border size
+    private var score: Int = 0                                                  // Current score
+
+    fun checkButton(currentButt: Button)                                        // If clicked
     {
-        val textView: TextView = findViewById(R.id.textView1)
-        if (currentButt.text == "$sum")
+        if (currentButt.text == "$ans")                                         // Correct answer
         {
-            ans++
+            score++
             nextGame()
         }
-        else
+        else                                                                    // Incorrect
         {
-            ans -= mod / 10
+            score -= 5
             currentButt.text = "NO!!!"
         }
-        textView.text = "scores: $ans"
+
+        val textView: TextView = findViewById(R.id.textView1)                   // Update score
+        textView.text = "scores: $score"
     }
 
-    var isSetSum = false
+    var isSetAns = false
     var adds: MutableSet<Int> = mutableSetOf(0)
     fun setIntOn(currentButt: Button)
     {
-        if (!isSetSum && (Random.nextBoolean() || currentButt == findViewById<Button>(R.id.button4)))
+        if (!isSetAns &&                                                        // If'n set before
+            (Random.nextBoolean() || currentButt == findViewById(R.id.button4)))
         {
-            currentButt.text = "$sum"
-            isSetSum = true
+            currentButt.text = "$ans"
+            isSetAns = true
         }
-        else
+        else                                                                    // Set wrong ans
         {
-            var add = Random.nextInt(-25, 25)
+            var add = Random.nextInt(-19, 19)
             if (Random.nextBoolean() && add % 10 != 0)
             {
                 add /= 2
@@ -79,40 +81,64 @@ class MainActivity : AppCompatActivity()
             {
                 add = adds.last() + 1
             }
-            if (add == 0) add = 10
+            if (add == 0)
+            {
+                add = 10
+            }
 
             adds.add(add)
 
-            var nextSum = sum + add
-            currentButt.text = "$nextSum"
+            var nextAns = ans + add
+            currentButt.text = "$nextAns"
         }
     }
 
-    fun nextGame()
+    fun setExpression(left: Int, right: Int, c: Char)                           // Set main text
     {
-        mod += mod / 2
-        mod = if (mod > 10000) 10000 else mod
-
-        var left  = Random.nextInt(-mod, mod)
-        var right = Random.nextInt(-mod, mod)
-        sum = left + right
+        var out = ""
+        out += if (left < 0) "($left)" else "$left"
+        out += if (c == '+') " + " else " * "
+        out += if (right < 0) "($right)" else "$right"
+        out += " = ?"
 
         val textView: TextView = findViewById(R.id.textView)
-        if (right < 0)
-        {
-            right *= -1;
-            textView.text = "$left - $right = ?"
-        }
-        else
-        {
-            textView.text = "$left + $right = ?"
-        }
+        textView.text = out
 
-        isSetSum = false
+        isSetAns = false
         adds.clear()
+
         setIntOn(findViewById(R.id.button1))
         setIntOn(findViewById(R.id.button2))
         setIntOn(findViewById(R.id.button3))
         setIntOn(findViewById(R.id.button4))
+    }
+
+    fun nextGame()                                                              // Make scene
+    {
+        mod += mod / 5
+        mod = if (mod > 10000) 10000 else mod
+
+        var left  = Random.nextInt(-mod, mod)
+        var right = Random.nextInt(-mod, mod)
+
+        if (Random.nextBoolean())                                               // Addition
+        {
+            ans = left + right
+            setExpression(left, right, '+')
+        }
+        else                                                                    // Multiplication
+        {
+            left = (left / 10 + Random.nextInt(-1, 2)) % 100
+            right = (right / 10 + Random.nextInt(-1, 2)) % 1000
+            if (Random.nextBoolean())                                           // Swap
+            {
+                left += right
+                right = left - right
+                left -= right
+            }
+
+            ans = left * right
+            setExpression(left, right, '*')
+        }
     }
 }

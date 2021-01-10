@@ -2,5 +2,6 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$/BrainUp" vcs="" />
+    <mapping directory="$PROJECT_DIR$/ForGit" vcs="Git" />
   </component>
 </project>

@@ -23,22 +23,27 @@ class MainActivity : AppCompatActivity()
         nextGame()                                                              // Start!
     }
 
-    private var ans = 0                                                         // Right answer
-    private var mod = 10                                                        // Border size
-    private var score = 0
-    private var bestScore = 0
+    var ans = 0                                                                 // Right answer
+    var mod = 10                                                                // Border size
+    var score = 0
+    var left = 0
+    var right = 0
 
-    private fun getBestScore() : Int
+    private var bestScore = 0
+    fun getBestScore() : Int
     {
-        try {
+        return try
+        {
             val fin = openFileInput("bestScore.txt")
-            return fin.read()
-        } catch (ex: IOException) {
-            return 0
+            fin.read()
+        }
+        catch (ex: IOException)
+        {
+            0
         }
     }
 
-    private fun updateBestScore()
+    fun updateBestScore()
     {
         val fos = openFileOutput("bestScore.txt", MODE_PRIVATE)
         bestScore = score
@@ -92,12 +97,12 @@ class MainActivity : AppCompatActivity()
             }
             previous.add(add)
 
-            var nextAns = ans + add
+            val nextAns = ans + add
             currentButt.text = "$nextAns"
         }
     }
 
-    fun setExpression(left: Int, right: Int, c: Char)                           // Set main text
+    fun setExpression(c: Char)                                                  // Set main text
     {
         var out = ""
         out += if (left < 0) "($left)" else "$left"
@@ -117,36 +122,70 @@ class MainActivity : AppCompatActivity()
         setIntOn(findViewById(R.id.button4))
     }
 
+    fun pow() : Int                                                             // bin pow
+    {
+        var res = 1
+        var p = left
+        var d = right
+
+        while(d > 0)
+        {
+            if (d % 2 == 1) res *= p
+            p *= p
+            d /= 2
+        }
+
+        return res
+    }
+
     fun nextGame()                                                              // Make scene
     {
-        mod += mod / 10                                                         //
+        mod += mod / 10                                                         // Inc range
         mod = if (mod > 1000) 1000 else mod
-
-        var left  = Random.nextInt(-mod, mod)
-        var right = Random.nextInt(-mod, mod)
 
         if (Random.nextBoolean())                                               // Addition
         {
+            left  = Random.nextInt(-mod, mod)
+            right = Random.nextInt(-mod, mod)
             ans = left + right
 
-            setExpression(left, right, '+')
+            setExpression('+')
         }
         else if (Random.nextBoolean())                                          // Multiplication
         {
-            left = (left / 10 + Random.nextInt(1, 9)) % 100
-            right = (right / 10 + Random.nextInt(1, 9)) % 100
+            left  = Random.nextInt(-mod / 10, mod / 10) % 100
+            right = Random.nextInt(-mod / 10, mod / 10) % 100
             ans = left * right
 
-            setExpression(left, right, '*')
+            setExpression('*')
         }
-        else                                                                    // Division
+        else if (Random.nextBoolean())                                          // Division
         {
-            left = (left / 10 + Random.nextInt(1, 9)) % 100
-            right = (right / 10 + Random.nextInt(1, 9)) % 100
-            if (left == 0) left = Random.nextInt(2, 9)
-            ans = right
+            ans = Random.nextInt(-mod / 10, mod / 10) % 100
+            right = Random.nextInt(-mod / 10, mod / 10) % 100
+            if (right == 0) right++
+            left = ans * right
 
-            setExpression(left * right, left, '/')
+            setExpression('/')
+        }
+        else if (Random.nextBoolean())                                          // Remainder
+        {
+            left = Random.nextInt(-mod, mod) % 100
+            if (left == 0) left++
+            right = Random.nextInt(-mod, mod) % left
+            if (right == 0) right++
+            ans = left % right
+
+            setExpression('%')
+        }
+        else                                                                    // Pow
+        {
+            left = Random.nextInt(-mod / 10, mod / 10) % 100
+            right = Random.nextInt(0, 4)
+            if (right > 2) left %= 10
+            ans = pow()
+
+            setExpression('^')
         }
     }
 }

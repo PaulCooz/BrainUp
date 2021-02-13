@@ -153,16 +153,16 @@ class MainActivity : AppCompatActivity()
         }
         else if (Random.nextBoolean())                                          // Multiplication
         {
-            left  = Random.nextInt(-mod / 10, mod / 10) % 100
-            right = Random.nextInt(-mod / 10, mod / 10) % 100
+            left  = Random.nextInt(-mod / 2, mod / 2) % 100
+            right = Random.nextInt(-mod / 2, mod / 2) % 100
             ans = left * right
 
             setExpression('*')
         }
         else if (Random.nextBoolean())                                          // Division
         {
-            ans = Random.nextInt(-mod / 10, mod / 10) % 100
-            right = Random.nextInt(-mod / 10, mod / 10) % 100
+            ans = Random.nextInt(-mod / 2, mod / 2) % 100
+            right = Random.nextInt(-mod / 2, mod / 2) % 100
             if (right == 0) right++
             left = ans * right
 
@@ -180,7 +180,7 @@ class MainActivity : AppCompatActivity()
         }
         else                                                                    // Pow
         {
-            left = Random.nextInt(-mod / 10, mod / 10) % 100
+            left = Random.nextInt(-mod / 2, mod / 2) % 100
             right = Random.nextInt(0, 4)
             if (right > 2) left %= 10
             ans = pow()
